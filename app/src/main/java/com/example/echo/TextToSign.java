@@ -23,20 +23,24 @@ import android.os.Bundle;
 
 import android.os.Handler;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.AccelerateInterpolator;
 import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
+import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 
 
 public class TextToSign extends Activity  {
+    public static final String TAG = "tts";
 
     private EditText entertext;
     private ImageView imagev;
@@ -49,8 +53,18 @@ public class TextToSign extends Activity  {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Log.d(TAG, "tts activity started");
         setContentView(R.layout.activity_text_to_sign);
         entertext = (EditText) findViewById(R.id.editTextTTS);
+        entertext.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+            @Override
+            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+                if ((event != null && (event.getKeyCode() == KeyEvent.KEYCODE_ENTER)) || (actionId == EditorInfo.IME_ACTION_DONE)) {
+                    onSubmitClicked(v);
+                }
+                return false;
+            }
+        });
         try {
             text = getIntent().getExtras().getString("text");
 
@@ -72,29 +86,24 @@ public class TextToSign extends Activity  {
     public void onSubmitClicked(View v) {
         InputMethodManager inputManager = (InputMethodManager) this.getSystemService(getApplicationContext().INPUT_METHOD_SERVICE);
 
-        inputManager = (InputMethodManager) this.getSystemService(getApplicationContext().INPUT_METHOD_SERVICE);
-
         inputManager.hideSoftInputFromWindow(v.getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
 
         Toast.makeText(getApplicationContext(), "Processing...message_processing", Toast.LENGTH_SHORT).show();
 
         /* ImageView which shows the result images*/
         imagev = (ImageView) findViewById(R.id.signImageViewTTS);
-        String strtxt;
 
-        if (entertext.getText().toString().equals("")) {
+        String strtxt = entertext.getText().toString();
+//        Log.d(TAG, "onSubmitClicked: "+strtxt);
+        if (strtxt.equals("")) {
             Toast.makeText(getApplicationContext(), "Please Enter Somthing", Toast.LENGTH_SHORT).show();
             return;
-        } else
-            strtxt = entertext.getText().toString();
-
+        }
         processText(strtxt);
-
-
-
     }
 
     private void processText(String strtxt) {
+//        Log.d(TAG, "processText: entered");
         /* Split the input sentence into words */
         String[] words = strtxt.split("\\s+");
 
@@ -117,6 +126,7 @@ public class TextToSign extends Activity  {
             mURLs.add(url);
         }
         try {
+//            Log.d(TAG, "processText: "+mURLs.toString());
             loadNext();
         } catch (InterruptedException e) {
             // TODO Auto-generated catch block
@@ -127,14 +137,8 @@ public class TextToSign extends Activity  {
         }
     }
 
-
     private void loadNext() throws InterruptedException, ExecutionException {
         if (mURLs.isEmpty()) {
-
-            //ends here
-
-            Log.i("ahtrap","ended3");
-
             if(!text.equals("")){
                 final Handler handler = new Handler();
                 handler.postDelayed(new Runnable() {
@@ -166,7 +170,9 @@ public class TextToSign extends Activity  {
         protected Void doInBackground(Void... args) {
 
             /* if url is URL of number/alphabet */
+            Log.d(TAG, "doInBackground: "+url.toString());
             if(url.indexOf("numbers")>=0 || url.indexOf("fingerspelling")>=0){
+                Log.d(TAG, "doInBackground: this is a number or alphabet");
                 try {
                     bitmap = BitmapFactory.decodeStream((InputStream) new URL(url.toString()).getContent());
 
