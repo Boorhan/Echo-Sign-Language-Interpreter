@@ -1,5 +1,5 @@
 # <img src="photos/logo.jpg" alt="drawing" width="40"/> ECHO
-Echo is an language conversion app that take a form of language such as text, speech, sign as input and convert them into another form.
+Echo is an language conversion app that take a form of language such as text, speech, sign as input and convert them into another form. The app seamlessly translates between text, speech and American Sign Language, enabling bidirectional communication to help disabled people.
 
 **App Link**: [https://drive.google.com/file/d/1A96UCvGMN7egdgWwrFBrqMM0CqNyZnoH/view?usp=sharing](https://drive.google.com/file/d/1A96UCvGMN7egdgWwrFBrqMM0CqNyZnoH/view?usp=sharing)
 
